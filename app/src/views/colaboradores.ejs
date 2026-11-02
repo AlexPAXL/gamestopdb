@@ -7,7 +7,7 @@
 
 <div class="card mb-5">
   <h3 class="font-semibold text-slate-900 mb-1">Nuevo colaborador</h3>
-  <p class="text-xs text-slate-500 mb-4">Esto solo crea el registro de personal. El usuario con el que inicia sesión en el sistema lo crea un administrador aparte (ver README: <code class="text-xs bg-slate-100 px-1 py-0.5 rounded">scripts/seed_app_usuarios.js</code>).</p>
+  <p class="text-xs text-slate-500 mb-4">Esto solo crea el registro de personal. El usuario con el que inicia sesión en el sistema lo crea un administrador al momento de crear colaborador<code class="text-xs bg-slate-100 px-1 py-0.5 rounded">Nombre</code></p>
   <form method="post" action="/colaboradores" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     <div>

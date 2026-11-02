@@ -207,3 +207,31 @@ BEGIN
 END //
 
 DELIMITER ;
+
+
+
+-- PARA CREAR USUAURIOS
+CREATE EXTENSION IF NOT EXISTS pgcrypto;-- para activar la incriptacion desde la bd
+
+
+DELIMITER //
+
+CREATE TRIGGER trg_crear_usuario_colaborador
+AFTER INSERT ON colaborador
+FOR EACH ROW
+BEGIN
+    -- Genera un usuario básico basado en el nombre (ej: primeras letras o minúsculas) y una contraseña temporal por defecto cifrada
+    INSERT INTO app_usuario (usuario, password_hash, rol, fk_Colaborador, activo)
+    VALUES (
+        LOWER(REPLACE(NEW.nombre_colaborador, ' ', '')), 
+         crypt(NEW.nombre_colaborador, gen_salt('bf', 12)), -- Reemplaza con un hash bcrypt válido de ejemplo
+        CASE 
+            WHEN NEW.puesto_colaborador LIKE '%Gerente%' THEN 'gerente'
+            ELSE 'vendedor'
+        END,
+        NEW.idColaborador,
+        1
+    );
+END//
+
+DELIMITER ;

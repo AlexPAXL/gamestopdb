@@ -1,5 +1,6 @@
 'use strict';
 const express = require('express');
+const bcrypt = require('bcrypt');
 const { requireRole } = require('../middleware/auth');
 
 const router = express.Router();
@@ -15,13 +16,42 @@ router.get('/', puedeUsar, async (req, res) => {
 
 router.post('/', puedeUsar, async (req, res) => {
   const { nombre_colaborador, puesto_colaborador, fk_Sucursal } = req.body;
-  await req.db.query('INSERT INTO colaborador (nombre_colaborador, puesto_colaborador, fk_Sucursal) VALUES (?, ?, ?)', [
-    nombre_colaborador,
-    puesto_colaborador,
-    fk_Sucursal,
-  ]);
-  req.flash('success', 'Colaborador registrado. Para que pueda entrar al sistema, un administrador debe crear su usuario de acceso (ver README).');
-  res.redirect('/colaboradores');
+  
+  const connection = await req.db.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    // 1. Insertar el colaborador en la base de datos
+    const [resultColab] = await connection.query(
+      'INSERT INTO colaborador (nombre_colaborador, puesto_colaborador, fk_Sucursal) VALUES (?, ?, ?)',
+      [nombre_colaborador, puesto_colaborador, fk_Sucursal]
+    );
+    const idColaborador = resultColab.insertId;
+
+    // 2. Generar usuario automático (minúsculas y sin espacios) y contraseña temporal cifrada
+    const usuarioGenerado = nombre_colaborador.toLowerCase().replace(/\s+/g, '').substring(0, 20);
+    const passwordHash = await bcrypt.hash(nombre_colaborador, 12); // Contraseña temporal por defecto: 123456
+
+    // 3. Asignar rol según el puesto del colaborador
+    const rolAsignado = puesto_colaborador.toLowerCase().includes('gerente') ? 'gerente' : 'vendedor';
+
+    // 4. Crear el usuario de acceso vinculado en app_usuario sin dejar campos en NULL
+    await connection.query(
+      'INSERT INTO app_usuario (usuario, password_hash, rol, fk_Colaborador, activo) VALUES (?, ?, ?, ?, 1)',
+      [usuarioGenerado, passwordHash, rolAsignado, idColaborador]
+    );
+
+    await connection.commit();
+    connection.release();
+
+    req.flash('success', `Colaborador registrado. Usuario generado automáticamente: ${usuarioGenerado} (Contraseña temporal:como su nombre).`);
+    res.redirect('/colaboradores');
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    req.flash('error', 'No se pudo registrar el colaborador: ' + (err.sqlMessage || err.message));
+    res.redirect('/colaboradores');
+  }
 });
 
 router.post('/:id/activo', puedeUsar, async (req, res) => {
