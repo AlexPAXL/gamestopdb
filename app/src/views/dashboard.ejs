@@ -1,46 +1,186 @@
 <%- include('partials/top') %>
 
-<h1>Hola, <%= currentUser.nombreColaborador || currentUser.usuario %></h1>
-<p class="subtitle">
-  Rol: <strong><%= currentUser.rol %></strong>
-  <% if (currentUser.nombreSucursal) { %> · Sucursal: <strong><%= currentUser.nombreSucursal %></strong><% } %>
+<h2 class="text-xl font-semibold text-slate-900">Hola, <%= currentUser.nombreColaborador || currentUser.usuario %></h2>
+<p class="text-slate-500 mb-6">
+  Rol: <strong class="text-slate-700 capitalize"><%= currentUser.rol %></strong>
+  <% if (currentUser.nombreSucursal) { %> · Sucursal: <strong class="text-slate-700"><%= currentUser.nombreSucursal %></strong><% } %>
 </p>
 
-<div class="grid-2">
-  <% if (['vendedor','gerente','admin'].includes(currentUser.rol)) { %>
+<% if (stats && stats.vendedor) { %>
+<div class="grid grid-cols-2 sm:grid-cols-2 gap-4 mb-8 max-w-xl">
+  <div class="card flex items-center gap-4">
+    <span class="w-11 h-11 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center shrink-0"><%- include('partials/icon', { name: 'catalogo', cls: 'w-5 h-5' }) %></span>
+    <div><p class="text-2xl font-bold text-slate-900"><%= stats.vendedor.productos %></p><p class="text-sm text-slate-500">Productos en tu sucursal</p></div>
+  </div>
+  <div class="card flex items-center gap-4">
+    <span class="w-11 h-11 rounded-lg bg-warn-50 text-warn-600 flex items-center justify-center shrink-0"><%- include('partials/icon', { name: 'alert-triangle', cls: 'w-5 h-5' }) %></span>
+    <div><p class="text-2xl font-bold text-slate-900"><%= stats.vendedor.stockBajo %></p><p class="text-sm text-slate-500">Productos con stock bajo</p></div>
+  </div>
+</div>
+<% } %>
+
+<% if (stats && stats.gestion) { %>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
   <div class="card">
-    <h3>Punto de venta</h3>
-    <p class="muted">Registra una venta, revisa el inventario de tu sucursal o da de alta un cliente.</p>
-    <p><a class="btn" href="/ventas/nueva">Nueva venta</a> <a class="btn btn-secondary" href="/inventario">Ver inventario</a></p>
+    <div class="flex items-center justify-between mb-2">
+      <span class="w-9 h-9 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center"><%- include('partials/icon', { name: 'ventas', cls: 'w-[18px] h-[18px]' }) %></span>
+    </div>
+    <p class="text-2xl font-bold text-slate-900">Q<%= stats.gestion.totalHoy.toFixed(2) %></p>
+    <p class="text-sm text-slate-500"><%= stats.gestion.ventasHoy %> venta<%= stats.gestion.ventasHoy === 1 ? '' : 's' %> hoy</p>
+  </div>
+  <div class="card">
+    <div class="flex items-center justify-between mb-2">
+      <span class="w-9 h-9 rounded-lg bg-success-50 text-success-600 flex items-center justify-center"><%- include('partials/icon', { name: 'chart-pie', cls: 'w-[18px] h-[18px]' }) %></span>
+    </div>
+    <p class="text-2xl font-bold text-slate-900">Q<%= stats.gestion.totalMes.toFixed(2) %></p>
+    <p class="text-sm text-slate-500">Facturación del mes</p>
+  </div>
+  <div class="card">
+    <div class="flex items-center justify-between mb-2">
+      <span class="w-9 h-9 rounded-lg bg-warn-50 text-warn-600 flex items-center justify-center"><%- include('partials/icon', { name: 'alert-triangle', cls: 'w-[18px] h-[18px]' }) %></span>
+    </div>
+    <p class="text-2xl font-bold text-slate-900"><%= stats.gestion.stockBajo %></p>
+    <p class="text-sm text-slate-500">Productos con stock bajo</p>
+  </div>
+  <div class="card">
+    <div class="flex items-center justify-between mb-2">
+      <span class="w-9 h-9 rounded-lg bg-brand-900/10 text-brand-900 flex items-center justify-center"><%- include('partials/icon', { name: 'clientes', cls: 'w-[18px] h-[18px]' }) %></span>
+    </div>
+    <p class="text-2xl font-bold text-slate-900"><%= stats.gestion.clientes %></p>
+    <p class="text-sm text-slate-500">Clientes registrados</p>
+  </div>
+</div>
+<% } %>
+
+<% if (stats && stats.auditor) { %>
+<div class="grid grid-cols-2 gap-4 mb-8 max-w-xl">
+  <div class="card">
+    <p class="text-2xl font-bold text-slate-900"><%= stats.auditor.numVentas %></p>
+    <p class="text-sm text-slate-500">Ventas completadas registradas</p>
+  </div>
+  <div class="card">
+    <p class="text-2xl font-bold text-slate-900">Q<%= stats.auditor.total.toFixed(2) %></p>
+    <p class="text-sm text-slate-500">Facturación total (histórica)</p>
+  </div>
+</div>
+<% } %>
+
+<% if (charts) { %>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+  <div class="card lg:col-span-2">
+    <h3 class="text-sm font-semibold text-slate-700 mb-3">Facturación por mes</h3>
+    <% if (charts.facturacion.length === 0) { %>
+      <p class="text-sm text-slate-500">Todavía no hay ventas completadas registradas.</p>
+    <% } else { %>
+      <canvas id="chart-facturacion" height="110"></canvas>
+    <% } %>
+  </div>
+  <div class="card">
+    <h3 class="text-sm font-semibold text-slate-700 mb-3">Top 5 productos</h3>
+    <% if (charts.topProductos.length === 0) { %>
+      <p class="text-sm text-slate-500">Todavía no hay ventas completadas registradas.</p>
+    <% } else { %>
+      <canvas id="chart-top-productos" height="140"></canvas>
+    <% } %>
+  </div>
+</div>
+<script src="/js/vendor/chart.umd.min.js"></script>
+<script nonce="<%= cspNonce %>">
+  const _facturacion = <%- JSON.stringify(charts.facturacion) %>;
+  const _topProductos = <%- JSON.stringify(charts.topProductos) %>;
+  const _grisEje = '#94a3b8';
+  if (_facturacion.length) {
+    new Chart(document.getElementById('chart-facturacion'), {
+      type: 'bar',
+      data: {
+        labels: _facturacion.map((f) => f.mes),
+        datasets: [{ label: 'Facturación (Q)', data: _facturacion.map((f) => Number(f.total)), backgroundColor: '#1565c0', borderRadius: 6 }],
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { color: _grisEje } }, x: { ticks: { color: _grisEje } } },
+      },
+    });
+  }
+  if (_topProductos.length) {
+    new Chart(document.getElementById('chart-top-productos'), {
+      type: 'bar',
+      data: {
+        labels: _topProductos.map((p) => p.nombre_producto),
+        datasets: [{ label: 'Unidades', data: _topProductos.map((p) => Number(p.unidades)), backgroundColor: '#0f2d4d', borderRadius: 6 }],
+      },
+      options: {
+        indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true, ticks: { color: _grisEje } }, y: { ticks: { color: _grisEje } } },
+      },
+    });
+  }
+</script>
+<% } %>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+  <% if (['vendedor', 'gerente', 'admin'].includes(currentUser.rol)) { %>
+  <div class="card">
+    <h3 class="font-semibold text-slate-900 mb-1">Punto de venta</h3>
+    <p class="text-sm text-slate-500 mb-4">Registra una venta, revisa el inventario de tu sucursal o da de alta un cliente.</p>
+    <div class="flex flex-wrap gap-2">
+      <a class="btn btn-primary" href="/ventas/nueva">Nueva venta</a>
+      <a class="btn btn-secondary" href="/inventario">Ver inventario</a>
+    </div>
   </div>
   <% } %>
 
-  <% if (['gerente','admin'].includes(currentUser.rol)) { %>
+  <% if (['gerente', 'admin'].includes(currentUser.rol)) { %>
   <div class="card">
-    <h3>Gestión</h3>
-    <p class="muted">Catálogo, proveedores, compras y el personal de tus sucursales.</p>
-    <p>
-      <a class="btn" href="/compras/nueva">Registrar compra</a>
+    <h3 class="font-semibold text-slate-900 mb-1">Gestión</h3>
+    <p class="text-sm text-slate-500 mb-4">Catálogo, proveedores, compras y el personal de tus sucursales.</p>
+    <div class="flex flex-wrap gap-2">
+      <a class="btn btn-primary" href="/compras/nueva">Registrar compra</a>
       <a class="btn btn-secondary" href="/catalogo/productos">Catálogo</a>
-    </p>
+    </div>
   </div>
   <% } %>
 
-  <% if (['gerente','admin','auditor'].includes(currentUser.rol)) { %>
+  <% if (['gerente', 'admin', 'auditor'].includes(currentUser.rol)) { %>
   <div class="card">
-    <h3>Reportes y auditoría</h3>
-    <p class="muted">Ventas por sucursal, productos más vendidos, stock bajo y la bitácora de accesos.</p>
-    <p><a class="btn" href="/reportes">Ver reportes</a> <a class="btn btn-secondary" href="/bitacora">Bitácora</a></p>
+    <h3 class="font-semibold text-slate-900 mb-1">Reportes y auditoría</h3>
+    <p class="text-sm text-slate-500 mb-4">Ventas por sucursal, productos más vendidos, stock bajo y la bitácora de accesos.</p>
+    <div class="flex flex-wrap gap-2">
+      <a class="btn btn-primary" href="/reportes">Ver reportes</a>
+      <a class="btn btn-secondary" href="/bitacora">Bitácora</a>
+    </div>
   </div>
   <% } %>
 
   <% if (currentUser.rol === 'admin') { %>
   <div class="card">
-    <h3>Administración</h3>
-    <p class="muted">Sucursales, colaboradores y mantenimiento general del sistema.</p>
-    <p><a class="btn" href="/sucursales">Sucursales</a> <a class="btn btn-secondary" href="/colaboradores">Colaboradores</a></p>
+    <h3 class="font-semibold text-slate-900 mb-1">Administración</h3>
+    <p class="text-sm text-slate-500 mb-4">Sucursales, colaboradores y mantenimiento general del sistema.</p>
+    <div class="flex flex-wrap gap-2">
+      <a class="btn btn-primary" href="/sucursales">Sucursales</a>
+      <a class="btn btn-secondary" href="/colaboradores">Colaboradores</a>
+    </div>
   </div>
   <% } %>
 </div>
+
+<% if (actividad && actividad.length) { %>
+<div class="card">
+  <h3 class="text-sm font-semibold text-slate-700 mb-3">Actividad reciente</h3>
+  <ul class="divide-y divide-slate-100">
+    <% actividad.forEach(a => { %>
+    <li class="py-2.5 flex items-center gap-3 text-sm">
+      <span class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center shrink-0"><%- include('partials/icon', { name: 'bitacora', cls: 'w-4 h-4' }) %></span>
+      <span class="flex-1 min-w-0">
+        <span class="font-medium text-slate-800"><%= a.operacion %></span>
+        <span class="text-slate-500"> en <%= a.tabla %> · <code class="text-xs"><%= a.usuario_db %></code></span>
+      </span>
+      <span class="text-xs text-slate-400 shrink-0"><%= new Date(a.fecha).toLocaleString('es-GT', { dateStyle: 'short', timeStyle: 'short' }) %></span>
+    </li>
+    <% }) %>
+  </ul>
+</div>
+<% } %>
 
 <%- include('partials/bottom') %>

@@ -1,14 +1,23 @@
 <%- include('../partials/top') %>
 
-<h1>Reportes</h1>
-<p class="subtitle">Disponibles para tu rol.</p>
+<div class="mb-5">
+  <h2 class="text-lg font-semibold text-slate-900">Reportes</h2>
+  <p class="text-slate-500 text-sm">Disponibles para tu rol.</p>
+</div>
 
-<div class="card">
-  <ul>
-    <% reportes.forEach(r => { %>
-      <li><a href="/reportes/<%= r.key %>"><%= r.titulo %></a></li>
-    <% }) %>
-  </ul>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  <% reportes.forEach(r => { %>
+  <a href="/reportes/<%= r.key %>" class="card flex items-start gap-3 hover:border-primary-300 hover:shadow-md transition">
+    <div class="w-9 h-9 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
+      <%- include('../partials/icon', { name: 'chart-pie', cls: 'w-5 h-5' }) %>
+    </div>
+    <div>
+      <p class="font-medium text-slate-900 text-sm"><%= r.titulo %></p>
+      <% if (r.nota) { %><p class="text-xs text-slate-500 mt-1"><%= r.nota %></p><% } %>
+    </div>
+  </a>
+  <% }) %>
+  <% if (reportes.length === 0) { %><p class="text-sm text-slate-500">No hay reportes disponibles para tu rol.</p><% } %>
 </div>
 
 <%- include('../partials/bottom') %>

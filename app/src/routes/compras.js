@@ -2,6 +2,7 @@
 const express = require('express');
 const { requireRole } = require('../middleware/auth');
 const { registrarCompra } = require('../lib/procs');
+const { mensajeAmigable } = require('../lib/errores');
 
 const router = express.Router();
 const puedeUsar = requireRole('gerente', 'admin');
@@ -44,7 +45,8 @@ router.post('/', puedeUsar, async (req, res) => {
     req.flash('success', `Compra #${idCompra} registrada; el inventario ya quedó actualizado.`);
     res.redirect('/compras');
   } catch (err) {
-    req.flash('error', err.sqlMessage || 'No se pudo registrar la compra.');
+    console.error('Error al registrar compra:', err);
+    req.flash('error', mensajeAmigable(err, 'No se pudo registrar la compra. Verifica los datos e intenta de nuevo.'));
     res.redirect('/compras/nueva');
   }
 });

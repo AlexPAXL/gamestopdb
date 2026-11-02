@@ -1,34 +1,39 @@
 <%- include('../partials/top') %>
 
-<div class="toolbar">
+<div class="flex items-center justify-between mb-5 flex-wrap gap-3">
   <div>
-    <h1>Catálogo de productos</h1>
-    <p class="subtitle">SKU, categoría, plataforma y precio.</p>
+    <h2 class="text-lg font-semibold text-slate-900">Catálogo de productos</h2>
+    <p class="text-slate-500 text-sm">SKU, categoría, plataforma y precio.</p>
   </div>
   <% if (puedeEditar) { %>
-    <a class="btn" href="/catalogo/productos/nuevo">+ Nuevo producto</a>
+  <div class="flex gap-2">
+    <a class="btn btn-primary" href="/catalogo/productos/nuevo"><%- include('../partials/icon', { name: 'plus', cls: 'w-4 h-4' }) %> Nuevo producto</a>
     <a class="btn btn-secondary" href="/catalogo/categorias">Categorías / plataformas</a>
+  </div>
   <% } %>
 </div>
 
-<table>
-  <thead>
-    <tr><th>SKU</th><th>Nombre</th><th>Marca</th><th>Categoría</th><th>Plataforma</th><th>Precio</th><th>Estado</th><% if (puedeEditar) { %><th></th><% } %></tr>
-  </thead>
-  <tbody>
-    <% productos.forEach(p => { %>
-    <tr>
-      <td><code><%= p.codigo_sku %></code></td>
-      <td><%= p.nombre_producto %></td>
-      <td><%= p.marca_producto %></td>
-      <td><%= p.nombre_categoria %></td>
-      <td><%= p.nombre_plataforma || '—' %></td>
-      <td>Q<%= Number(p.precio_producto).toFixed(2) %></td>
-      <td><span class="badge <%= p.activo ? 'ok' : 'off' %>"><%= p.activo ? 'Activo' : 'Descontinuado' %></span></td>
-      <% if (puedeEditar) { %><td><a href="/catalogo/productos/<%= p.idProducto %>/editar">Editar</a></td><% } %>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr><th>SKU</th><th>Nombre</th><th>Marca</th><th>Categoría</th><th>Plataforma</th><th>Precio</th><th>Estado</th><% if (puedeEditar) { %><th></th><% } %></tr>
+    </thead>
+    <tbody>
+      <% productos.forEach(p => { %>
+      <tr>
+        <td><code class="text-xs bg-slate-100 px-1.5 py-0.5 rounded"><%= p.codigo_sku %></code></td>
+        <td class="font-medium text-slate-800"><%= p.nombre_producto %></td>
+        <td><%= p.marca_producto %></td>
+        <td><%= p.nombre_categoria %></td>
+        <td><%= p.nombre_plataforma || '—' %></td>
+        <td>Q<%= Number(p.precio_producto).toFixed(2) %></td>
+        <td><span class="badge <%= p.activo ? 'badge-ok' : 'badge-off' %>"><%= p.activo ? 'Activo' : 'Descontinuado' %></span></td>
+        <% if (puedeEditar) { %><td><a href="/catalogo/productos/<%= p.idProducto %>/editar" class="text-primary-500 hover:text-primary-700 font-medium text-sm">Editar</a></td><% } %>
+      </tr>
+      <% }) %>
+      <% if (productos.length === 0) { %><tr><td colspan="8" class="text-sm text-slate-500 text-center py-6">Sin productos registrados.</td></tr><% } %>
+    </tbody>
+  </table>
+</div>
 
 <%- include('../partials/bottom') %>

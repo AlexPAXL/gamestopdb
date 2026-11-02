@@ -3,44 +3,127 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title><%= title %> · GameStop</title>
+  <title><%= title %> · GameStop GT</title>
   <link rel="stylesheet" href="/css/style.css" />
 </head>
-<body>
+<body class="bg-surface text-slate-800 antialiased">
 <% const u = currentUser; %>
-<header class="top">
-  <div class="brand">🎮 GameStop · Sistema de gestión</div>
-  <% if (u) { %>
-  <nav>
-    <a href="/">Panel</a>
-    <% if (u.rol === 'vendedor' || u.rol === 'gerente' || u.rol === 'admin') { %>
-      <a href="/catalogo/productos">Catálogo</a>
-      <a href="/inventario">Inventario</a>
-      <a href="/ventas/nueva">Nueva venta</a>
-      <a href="/clientes">Clientes</a>
+<% if (u) { %>
+<div x-data="sidebar" class="min-h-screen flex bg-surface">
+  <div x-show="open" @click="open = false" x-transition.opacity x-cloak class="fixed inset-0 bg-slate-900/50 z-30 lg:hidden"></div>
+
+  <aside :class="open ? 'translate-x-0' : '-translate-x-full'" class="-translate-x-full fixed inset-y-0 left-0 z-40 w-64 bg-brand-950 text-slate-200 flex flex-col transition-transform duration-200 lg:translate-x-0 lg:static lg:shrink-0">
+    <div class="h-16 flex items-center gap-2 px-5 border-b border-white/10 shrink-0">
+      <span class="text-2xl leading-none">🎮</span>
+      <span class="font-bold text-white tracking-tight">GameStop GT</span>
+      <button type="button" @click="open = false" class="ml-auto lg:hidden text-slate-400 hover:text-white p-1">
+        <%- include('icon', { name: 'x', cls: 'w-5 h-5' }) %>
+      </button>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-6 text-sm">
+      <div>
+        <a href="/" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium transition-colors <%= currentPath === '/' ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white' %>">
+          <%- include('icon', { name: 'home', cls: 'w-[18px] h-[18px]' }) %> Panel
+        </a>
+      </div>
+
+      <% if (['vendedor', 'gerente', 'admin'].includes(u.rol)) { %>
+      <div>
+        <p class="px-3 mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">Ventas y catálogo</p>
+        <% [
+          ['/ventas/nueva', 'ventas', 'Nueva venta'],
+          ['/catalogo/productos', 'catalogo', 'Catálogo'],
+          ['/inventario', 'inventario', 'Inventario'],
+          ['/clientes', 'clientes', 'Clientes'],
+        ].forEach(([href, icon, label]) => { %>
+        <a href="<%= href %>" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium transition-colors <%= currentPath.startsWith(href) ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white' %>">
+          <%- include('icon', { name: icon, cls: 'w-[18px] h-[18px]' }) %> <%= label %>
+        </a>
+        <% }) %>
+      </div>
+      <% } %>
+
+      <% if (['gerente', 'admin'].includes(u.rol)) { %>
+      <div>
+        <p class="px-3 mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">Gestión</p>
+        <% [
+          ['/ventas', 'reportes', 'Historial de ventas'],
+          ['/compras', 'compras', 'Compras'],
+          ['/proveedores', 'proveedores', 'Proveedores'],
+          ['/sucursales', 'sucursales', 'Sucursales'],
+          ['/colaboradores', 'colaboradores', 'Colaboradores'],
+        ].forEach(([href, icon, label]) => { %>
+        <a href="<%= href %>" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium transition-colors <%= currentPath.startsWith(href) ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white' %>">
+          <%- include('icon', { name: icon, cls: 'w-[18px] h-[18px]' }) %> <%= label %>
+        </a>
+        <% }) %>
+      </div>
+      <% } %>
+
+      <% if (['gerente', 'admin', 'auditor'].includes(u.rol)) { %>
+      <div>
+        <p class="px-3 mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">Reportes y auditoría</p>
+        <% [
+          ['/reportes', 'chart-pie', 'Reportes'],
+          ['/bitacora', 'bitacora', 'Bitácora'],
+        ].forEach(([href, icon, label]) => { %>
+        <a href="<%= href %>" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium transition-colors <%= currentPath.startsWith(href) ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white' %>">
+          <%- include('icon', { name: icon, cls: 'w-[18px] h-[18px]' }) %> <%= label %>
+        </a>
+        <% }) %>
+      </div>
+      <% } %>
+    </nav>
+  </aside>
+
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="h-16 bg-white border-b border-slate-200 flex items-center gap-3 px-4 lg:px-6 sticky top-0 z-20 shrink-0">
+      <button type="button" @click="open = true" class="lg:hidden p-2 -ml-2 text-slate-500 hover:text-slate-800">
+        <%- include('icon', { name: 'menu', cls: 'w-5 h-5' }) %>
+      </button>
+      <h1 class="text-base font-semibold text-slate-800 truncate"><%= title %></h1>
+
+      <div x-data="dropdown" @click.outside="open = false" class="ml-auto relative">
+        <button type="button" @click="open = !open" class="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-100 transition-colors">
+          <span class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-semibold shrink-0">
+            <%= (u.nombreColaborador || u.usuario).charAt(0).toUpperCase() %>
+          </span>
+          <span class="hidden sm:block text-left leading-tight">
+            <span class="block text-sm font-medium text-slate-800"><%= u.nombreColaborador || u.usuario %></span>
+            <span class="block text-xs text-slate-500 capitalize"><%= u.rol %><%= u.nombreSucursal ? ' · ' + u.nombreSucursal : '' %></span>
+          </span>
+          <%- include('icon', { name: 'chevron-down', cls: 'w-4 h-4 text-slate-400 hidden sm:block' }) %>
+        </button>
+        <div x-show="open" x-transition x-cloak class="absolute right-0 mt-2 w-52 rounded-xl border border-slate-200 bg-white shadow-lg py-1 z-30">
+          <div class="px-4 py-2 border-b border-slate-100 sm:hidden">
+            <p class="text-sm font-medium text-slate-800"><%= u.nombreColaborador || u.usuario %></p>
+            <p class="text-xs text-slate-500 capitalize"><%= u.rol %></p>
+          </div>
+          <form method="post" action="/logout">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+              <%- include('icon', { name: 'logout', cls: 'w-4 h-4' }) %> Cerrar sesión
+            </button>
+          </form>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 p-4 lg:p-6 max-w-[1400px] w-full mx-auto">
+      <% if (typeof flash !== 'undefined' && flash) { %>
+        <div class="mb-5 rounded-lg px-4 py-3 text-sm flex items-start gap-2 <%= flash.type === 'error' ? 'bg-danger-50 text-danger-600' : 'bg-success-50 text-success-600' %>">
+          <%- include('icon', { name: flash.type === 'error' ? 'alert-triangle' : 'check', cls: 'w-5 h-5 mt-0.5 shrink-0' }) %>
+          <span><%= flash.message %></span>
+        </div>
+      <% } %>
+<% } else { %>
+<div class="min-h-screen flex items-center justify-center bg-surface p-4">
+  <main class="w-full max-w-md">
+    <% if (typeof flash !== 'undefined' && flash) { %>
+      <div class="mb-5 rounded-lg px-4 py-3 text-sm flex items-start gap-2 <%= flash.type === 'error' ? 'bg-danger-50 text-danger-600' : 'bg-success-50 text-success-600' %>">
+        <%- include('icon', { name: flash.type === 'error' ? 'alert-triangle' : 'check', cls: 'w-5 h-5 mt-0.5 shrink-0' }) %>
+        <span><%= flash.message %></span>
+      </div>
     <% } %>
-    <% if (u.rol === 'gerente' || u.rol === 'admin') { %>
-      <a href="/ventas">Ventas</a>
-      <a href="/compras">Compras</a>
-      <a href="/proveedores">Proveedores</a>
-      <a href="/sucursales">Sucursales</a>
-      <a href="/colaboradores">Colaboradores</a>
-    <% } %>
-    <% if (u.rol === 'gerente' || u.rol === 'admin' || u.rol === 'auditor') { %>
-      <a href="/reportes">Reportes</a>
-      <a href="/bitacora">Bitácora</a>
-    <% } %>
-  </nav>
-  <div class="user">
-    <span><%= u.nombreColaborador || u.usuario %> · <strong><%= u.rol %></strong><%= u.nombreSucursal ? ' · ' + u.nombreSucursal : '' %></span>
-    <form class="logout" method="post" action="/logout">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-      <button type="submit">Salir</button>
-    </form>
-  </div>
-  <% } %>
-</header>
-<main>
-  <% if (typeof flash !== 'undefined' && flash) { %>
-    <div class="flash <%= flash.type %>"><%= flash.message %></div>
-  <% } %>
+<% } %>

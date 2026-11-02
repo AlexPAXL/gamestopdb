@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+/* Los únicos lugares donde Tailwind no ve las clases automáticamente por
+   convención de nombre de archivo (todo lo demás, dentro de src/, ya lo
+   escanea solo). */
+@source "../../views";
+
+/* Oculta cualquier elemento controlado por Alpine (x-show) hasta que
+   Alpine termine de inicializar y tome el control. Tiene que ser una regla
+   de ESTA hoja de estilos (origen "self", permitido por nuestro CSP) y no
+   un atributo style="display:none" en el HTML: con style-src 'self' (sin
+   'unsafe-inline') el navegador ignora los estilos inline por completo, lo
+   que dejaba los modales de confirmación visibles tapando toda la pantalla
+   — bug real encontrado al probar con Playwright, no solo una sospecha. */
+[x-cloak] { display: none !important; }
+
+@theme {
+  /* Paleta GameStop GT — ver "Fase 3" del documento de auditoría.
+     Los tres colores de estado (--verde/--rojo/--fondo) ya existían en el
+     CSS original; se conservan con el mismo valor exacto. */
+  --color-brand-950: #0b2540;
+  --color-brand-900: #0f2d4d;
+  --color-brand-800: #16375c;
+  --color-brand-700: #1e4570;
+
+  --color-primary-50: #eaf2fb;
+  --color-primary-100: #cfe2f7;
+  --color-primary-500: #1565c0;
+  --color-primary-600: #0f4f9c;
+  --color-primary-700: #0b3d7a;
+
+  --color-success-50: #e7f6ec;
+  --color-success-600: #1b7a3d;
+
+  --color-warn-50: #fff3cd;
+  --color-warn-600: #b98900;
+
+  --color-danger-50: #fde8e7;
+  --color-danger-600: #b3261e;
+
+  --color-surface: #f5f6fa;
+}
+
+/* shortcut: pocas utilidades @layer en vez de @apply por doquier — con
+   Tailwind, componer utilidades directo en el EJS es más mantenible que
+   duplicar una capa de componentes paralela; estas son solo para patrones
+   que se repiten literalmente en 10+ vistas (botones, badges, campos). */
+@layer components {
+  /* .btn solo pone la base; el color va en una segunda clase (btn-primary,
+     btn-secondary...) que se combina en el HTML: class="btn btn-primary".
+     Tailwind v4 no permite @apply de una clase propia dentro de otra. */
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold
+           transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700;
+  }
+  .btn-secondary {
+    @apply bg-white text-primary-500 border border-primary-500 hover:bg-primary-50;
+  }
+  .btn-danger {
+    @apply bg-danger-600 text-white hover:bg-[#8c1d17];
+  }
+  .btn-ghost {
+    @apply bg-transparent text-slate-600 hover:bg-slate-100;
+  }
+
+  .field-label {
+    @apply block text-sm font-semibold text-slate-700 mb-1.5;
+  }
+  .field-input {
+    @apply w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900
+           placeholder:text-slate-400 transition-shadow duration-150
+           focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500;
+  }
+
+  /* Mismo patrón: class="badge badge-ok" en el HTML. */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+  .badge-ok { @apply bg-success-50 text-success-600; }
+  .badge-off { @apply bg-slate-100 text-slate-500; }
+  .badge-warn { @apply bg-warn-50 text-warn-600; }
+
+  .card {
+    @apply rounded-xl border border-slate-200 bg-white p-5 shadow-sm;
+  }
+
+  .table-wrap {
+    @apply overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm;
+  }
+  .data-table {
+    @apply w-full min-w-[640px] text-sm;
+  }
+  .data-table th {
+    @apply sticky top-0 bg-slate-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 border-b border-slate-200;
+  }
+  .data-table td {
+    @apply px-4 py-3 border-b border-slate-100 text-slate-700;
+  }
+  .data-table tbody tr {
+    @apply transition-colors hover:bg-slate-50;
+  }
+}

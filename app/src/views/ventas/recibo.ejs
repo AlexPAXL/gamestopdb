@@ -1,29 +1,36 @@
 <%- include('../partials/top') %>
 
-<h1>Venta #<%= idVenta %> registrada</h1>
-<p class="subtitle"><%= contexto.colaboradorNombre %> · <%= contexto.sucursalNombre %></p>
+<div class="flex items-center gap-3 mb-1">
+  <span class="w-10 h-10 rounded-full bg-success-50 text-success-600 flex items-center justify-center shrink-0">
+    <%- include('../partials/icon', { name: 'check', cls: 'w-5 h-5' }) %>
+  </span>
+  <h2 class="text-lg font-semibold text-slate-900">Venta #<%= idVenta %> registrada</h2>
+</div>
+<p class="text-slate-500 mb-5 ml-[52px]"><%= contexto.colaboradorNombre %> · <%= contexto.sucursalNombre %></p>
 
-<div class="card">
-  <table>
+<div class="table-wrap mb-5">
+  <table class="data-table">
     <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th></tr></thead>
     <tbody>
       <% let total = 0; %>
       <% recibo.forEach(l => { total += Number(l.subtotal_venta); %>
       <tr>
-        <td><%= l.nombre_producto %></td>
+        <td class="font-medium text-slate-800"><%= l.nombre_producto %></td>
         <td><%= l.cantidad %></td>
         <td>Q<%= Number(l.precio_unitario).toFixed(2) %></td>
         <td>Q<%= Number(l.subtotal_venta).toFixed(2) %></td>
       </tr>
       <% }) %>
     </tbody>
+    <tfoot>
+      <tr><td colspan="3" class="text-right font-semibold text-slate-700">Total</td><td class="font-bold text-slate-900">Q<%= total.toFixed(2) %></td></tr>
+    </tfoot>
   </table>
-  <p><strong>Total: Q<%= total.toFixed(2) %></strong></p>
 </div>
 
-<p>
-  <a class="btn" href="/ventas/nueva<%= contexto.colaboradorId ? '?colaborador=' + contexto.colaboradorId : '' %>">Registrar otra venta</a>
+<div class="flex gap-2">
+  <a class="btn btn-primary" href="/ventas/nueva<%= contexto.colaboradorId ? '?colaborador=' + contexto.colaboradorId : '' %>">Registrar otra venta</a>
   <a class="btn btn-secondary" href="/">Volver al panel</a>
-</p>
+</div>
 
 <%- include('../partials/bottom') %>

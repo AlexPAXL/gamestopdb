@@ -36,7 +36,7 @@ router.post('/:id/telefono', puedeUsar, async (req, res) => {
 });
 
 router.post('/:id/activa', puedeUsar, async (req, res) => {
-  await req.db.query('UPDATE sucursal SET activa = ? WHERE idSucursal = ?', [req.body.activa ? 1 : 0, req.params.id]);
+  await req.db.query('UPDATE sucursal SET activa = ? WHERE idSucursal = ?', [req.body.activa === '1' ? 1 : 0, req.params.id]);
   res.redirect('/sucursales');
 });
 

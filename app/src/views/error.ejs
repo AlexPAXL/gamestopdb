@@ -1,5 +1,14 @@
 <%- include('partials/top') %>
-<h1><%= title %></h1>
-<p><%= message %></p>
-<p><a class="btn" href="/">Volver al panel</a></p>
+
+<div class="<%= typeof currentUser !== 'undefined' && currentUser ? '' : 'card text-center' %>">
+  <div class="flex flex-col items-center text-center py-6">
+    <span class="w-14 h-14 rounded-full bg-danger-50 text-danger-600 flex items-center justify-center mb-4">
+      <%- include('partials/icon', { name: 'alert-triangle', cls: 'w-7 h-7' }) %>
+    </span>
+    <h1 class="text-lg font-semibold text-slate-900 mb-1"><%= title %></h1>
+    <p class="text-slate-500 mb-5"><%= message %></p>
+    <a class="btn btn-primary" href="/">Volver al panel</a>
+  </div>
+</div>
+
 <%- include('partials/bottom') %>

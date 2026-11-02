@@ -1,47 +1,83 @@
 <%- include('partials/top') %>
 
-<h1>Sucursales</h1>
+<div class="mb-5">
+  <h2 class="text-lg font-semibold text-slate-900">Sucursales</h2>
+  <p class="text-slate-500 text-sm">Puntos de venta y sus teléfonos de contacto.</p>
+</div>
 
-<div class="card">
-  <h3>Nueva sucursal</h3>
-  <form method="post" action="/sucursales">
+<div class="card mb-5">
+  <h3 class="font-semibold text-slate-900 mb-4">Nueva sucursal</h3>
+  <form method="post" action="/sucursales" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-    <div class="linea-detalle">
-      <div class="field"><label>Nombre</label><input name="nombre_sucursal" required /></div>
-      <div class="field"><label>Dirección</label><input name="direccion_sucursal" required /></div>
-      <div class="field"><label>Ciudad</label><input name="ciudad_sucursal" required /></div>
+    <div>
+      <label for="nombre_sucursal" class="field-label">Nombre</label>
+      <input id="nombre_sucursal" name="nombre_sucursal" required class="field-input" />
     </div>
-    <button type="submit">Crear</button>
+    <div>
+      <label for="direccion_sucursal" class="field-label">Dirección</label>
+      <input id="direccion_sucursal" name="direccion_sucursal" required class="field-input" />
+    </div>
+    <div>
+      <label for="ciudad_sucursal" class="field-label">Ciudad</label>
+      <input id="ciudad_sucursal" name="ciudad_sucursal" required class="field-input" />
+    </div>
+    <button type="submit" class="btn btn-primary">Crear</button>
   </form>
 </div>
 
-<table>
-  <thead><tr><th>Nombre</th><th>Dirección</th><th>Ciudad</th><th>Teléfonos</th><th>Estado</th><th></th></tr></thead>
-  <tbody>
-    <% sucursales.forEach(s => { %>
-    <tr>
-      <td><%= s.nombre_sucursal %></td>
-      <td><%= s.direccion_sucursal %></td>
-      <td><%= s.ciudad_sucursal %></td>
-      <td>
-        <%= (porSucursal[s.idSucursal] || []).join(', ') || '—' %>
-        <form method="post" action="/sucursales/<%= s.idSucursal %>/telefono" style="display:inline-flex;gap:0.25rem;margin-left:0.5rem">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-          <input name="telefono" placeholder="8 dígitos" style="width:100px" />
-          <button type="submit" class="btn-secondary btn">+</button>
-        </form>
-      </td>
-      <td><span class="badge <%= s.activa ? 'ok' : 'off' %>"><%= s.activa ? 'Activa' : 'Inactiva' %></span></td>
-      <td>
-        <form method="post" action="/sucursales/<%= s.idSucursal %>/activa" style="margin:0">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-          <input type="hidden" name="activa" value="<%= s.activa ? 0 : 1 %>" />
-          <button type="submit" class="btn-secondary btn"><%= s.activa ? 'Desactivar' : 'Activar' %></button>
-        </form>
-      </td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
+<div class="table-wrap">
+  <table class="data-table">
+    <thead><tr><th>Nombre</th><th>Dirección</th><th>Ciudad</th><th>Teléfonos</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+      <% sucursales.forEach(s => { %>
+      <tr>
+        <td class="font-medium text-slate-800"><%= s.nombre_sucursal %></td>
+        <td><%= s.direccion_sucursal %></td>
+        <td><%= s.ciudad_sucursal %></td>
+        <td>
+          <div class="flex items-center gap-2 flex-wrap">
+            <% (porSucursal[s.idSucursal] || []).forEach(tel => { %>
+              <span class="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded"><%= tel %></span>
+            <% }) %>
+            <% if (!(porSucursal[s.idSucursal] || []).length) { %><span class="text-slate-400 text-sm">—</span><% } %>
+            <form method="post" action="/sucursales/<%= s.idSucursal %>/telefono" class="flex items-center gap-1 m-0">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <input name="telefono" placeholder="8 dígitos" class="field-input w-28 text-xs py-1" />
+              <button type="submit" class="btn btn-secondary text-xs px-2 py-1">+</button>
+            </form>
+          </div>
+        </td>
+        <td><span class="badge <%= s.activa ? 'badge-ok' : 'badge-off' %>"><%= s.activa ? 'Activa' : 'Inactiva' %></span></td>
+        <td>
+          <% if (s.activa) { %>
+          <form method="post" action="/sucursales/<%= s.idSucursal %>/activa" x-data="confirmModal" class="m-0">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <input type="hidden" name="activa" value="0" />
+            <button type="button" @click="open = true" class="btn btn-secondary text-xs px-3 py-1.5">Desactivar</button>
+            <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+              <div @click.outside="open = false" class="card max-w-sm w-full">
+                <h3 class="font-semibold text-slate-900 mb-1">¿Desactivar <%= s.nombre_sucursal %>?</h3>
+                <p class="text-sm text-slate-500 mb-4">Dejará de estar disponible para nuevas ventas, compras o asignación de colaboradores. Puedes reactivarla después.</p>
+                <div class="flex justify-end gap-2">
+                  <button type="button" @click="open = false" class="btn btn-ghost">Cancelar</button>
+                  <button type="submit" class="btn btn-danger">Desactivar</button>
+                </div>
+              </div>
+            </div>
+          </form>
+          <% } else { %>
+          <form method="post" action="/sucursales/<%= s.idSucursal %>/activa" class="m-0">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <input type="hidden" name="activa" value="1" />
+            <button type="submit" class="btn btn-secondary text-xs px-3 py-1.5">Activar</button>
+          </form>
+          <% } %>
+        </td>
+      </tr>
+      <% }) %>
+      <% if (sucursales.length === 0) { %><tr><td colspan="6" class="text-sm text-slate-500 text-center py-6">Sin sucursales registradas.</td></tr><% } %>
+    </tbody>
+  </table>
+</div>
 
 <%- include('partials/bottom') %>

@@ -1,24 +1,26 @@
 <%- include('../partials/top') %>
 
-<p class="subtitle"><a href="/reportes">&larr; Todos los reportes</a></p>
-<h1><%= reporte.titulo %></h1>
-<% if (reporte.nota) { %><p class="muted"><%= reporte.nota %></p><% } %>
+<p class="mb-1"><a href="/reportes" class="text-primary-500 hover:text-primary-700 text-sm font-medium">&larr; Todos los reportes</a></p>
+<h2 class="text-lg font-semibold text-slate-900 mb-1"><%= reporte.titulo %></h2>
+<% if (reporte.nota) { %><p class="text-slate-500 text-sm mb-5"><%= reporte.nota %></p><% } else { %><div class="mb-5"></div><% } %>
 
 <% const columnas = filas.length ? Object.keys(filas[0]) : []; %>
-<table>
-  <thead>
-    <tr><% columnas.forEach(c => { %><th><%= c %></th><% }) %></tr>
-  </thead>
-  <tbody>
-    <% filas.forEach(fila => { %>
-    <tr>
-      <% columnas.forEach(c => { %>
-        <td><%= fila[c] === null ? '—' : fila[c] %></td>
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr><% columnas.forEach(c => { %><th><%= c %></th><% }) %></tr>
+    </thead>
+    <tbody>
+      <% filas.forEach(fila => { %>
+      <tr>
+        <% columnas.forEach(c => { %>
+          <td><%= fila[c] === null ? '—' : fila[c] %></td>
+        <% }) %>
+      </tr>
       <% }) %>
-    </tr>
-    <% }) %>
-    <% if (filas.length === 0) { %><tr><td colspan="<%= columnas.length || 1 %>" class="muted">Sin datos.</td></tr><% } %>
-  </tbody>
-</table>
+      <% if (filas.length === 0) { %><tr><td colspan="<%= columnas.length || 1 %>" class="text-sm text-slate-500 text-center py-6">Sin datos.</td></tr><% } %>
+    </tbody>
+  </table>
+</div>
 
 <%- include('../partials/bottom') %>

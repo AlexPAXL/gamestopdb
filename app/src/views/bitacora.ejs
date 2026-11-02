@@ -1,21 +1,23 @@
 <%- include('partials/top') %>
 
-<h1>Bitácora de auditoría</h1>
-<p class="subtitle">Últimos 150 registros. Solo lectura: ningún rol de negocio puede modificarla.</p>
+<div class="mb-5">
+  <h2 class="text-lg font-semibold text-slate-900">Bitácora de auditoría</h2>
+  <p class="text-slate-500 text-sm">Últimos 150 registros. Solo lectura: ningún rol de negocio puede modificarla.</p>
+</div>
 
-<form method="get" class="toolbar">
-  <div class="field" style="min-width:200px">
-    <label>Tabla</label>
-    <select name="tabla" onchange="this.form.submit()">
+<form method="get" x-data="autoSubmit" class="card mb-5 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
+  <div>
+    <label for="tabla" class="field-label">Tabla</label>
+    <select id="tabla" name="tabla" @change="$el.form.submit()" class="field-input">
       <option value="">— Todas —</option>
       <% ['venta','cliente','producto'].forEach(t => { %>
         <option value="<%= t %>" <%= tabla === t ? 'selected' : '' %>><%= t %></option>
       <% }) %>
     </select>
   </div>
-  <div class="field" style="min-width:200px">
-    <label>Operación</label>
-    <select name="operacion" onchange="this.form.submit()">
+  <div>
+    <label for="operacion" class="field-label">Operación</label>
+    <select id="operacion" name="operacion" @change="$el.form.submit()" class="field-input">
       <option value="">— Todas —</option>
       <% ['INSERT','UPDATE','DELETE','CONSULTA'].forEach(o => { %>
         <option value="<%= o %>" <%= operacion === o ? 'selected' : '' %>><%= o %></option>
@@ -24,21 +26,25 @@
   </div>
 </form>
 
-<table>
-  <thead><tr><th>Fecha</th><th>Usuario DB</th><th>Tabla</th><th>Operación</th><th>Registro</th><th>Detalle</th></tr></thead>
-  <tbody>
-    <% filas.forEach(f => { %>
-    <tr>
-      <td><%= new Date(f.fecha).toLocaleString('es-GT') %></td>
-      <td><code><%= f.usuario_db %></code></td>
-      <td><%= f.tabla %></td>
-      <td><%= f.operacion %></td>
-      <td><%= f.id_registro ?? '—' %></td>
-      <td class="muted"><%= f.detalle || (f.datos_nuevos ? JSON.stringify(f.datos_nuevos) : '') %></td>
-    </tr>
-    <% }) %>
-    <% if (filas.length === 0) { %><tr><td colspan="6" class="muted">Sin registros.</td></tr><% } %>
-  </tbody>
-</table>
+<div class="table-wrap">
+  <table class="data-table">
+    <thead><tr><th>Fecha</th><th>Usuario DB</th><th>Tabla</th><th>Operación</th><th>Registro</th><th>Detalle</th></tr></thead>
+    <tbody>
+      <% filas.forEach(f => { %>
+      <tr>
+        <td class="whitespace-nowrap"><%= new Date(f.fecha).toLocaleString('es-GT') %></td>
+        <td><code class="text-xs bg-slate-100 px-1.5 py-0.5 rounded"><%= f.usuario_db %></code></td>
+        <td><%= f.tabla %></td>
+        <td>
+          <span class="badge <%= f.operacion === 'DELETE' ? 'badge-warn' : f.operacion === 'INSERT' ? 'badge-ok' : 'badge-off' %>"><%= f.operacion %></span>
+        </td>
+        <td><%= f.id_registro ?? '—' %></td>
+        <td class="text-slate-500 text-xs max-w-md truncate"><%= f.detalle || (f.datos_nuevos ? JSON.stringify(f.datos_nuevos) : '') %></td>
+      </tr>
+      <% }) %>
+      <% if (filas.length === 0) { %><tr><td colspan="6" class="text-sm text-slate-500 text-center py-6">Sin registros.</td></tr><% } %>
+    </tbody>
+  </table>
+</div>
 
 <%- include('partials/bottom') %>

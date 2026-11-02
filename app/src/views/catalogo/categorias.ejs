@@ -1,40 +1,38 @@
 <%- include('../partials/top') %>
 
-<h1>Categorías y plataformas</h1>
-<p class="subtitle"><a href="/catalogo/productos">&larr; Volver al catálogo</a></p>
+<p class="mb-1"><a href="/catalogo/productos" class="text-primary-500 hover:text-primary-700 text-sm font-medium">&larr; Volver al catálogo</a></p>
+<h2 class="text-lg font-semibold text-slate-900 mb-5">Categorías y plataformas</h2>
 
-<div class="grid-2">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
   <div class="card">
-    <h3>Categorías</h3>
-    <table>
-      <tbody>
-        <% categorias.forEach(c => { %><tr><td><%= c.nombre_categoria %></td></tr><% }) %>
-      </tbody>
-    </table>
-    <form method="post" action="/catalogo/categorias">
+    <h3 class="font-semibold text-slate-900 mb-3">Categorías</h3>
+    <ul class="divide-y divide-slate-100 mb-4">
+      <% categorias.forEach(c => { %><li class="py-2 text-sm text-slate-700"><%= c.nombre_categoria %></li><% }) %>
+      <% if (categorias.length === 0) { %><li class="py-2 text-sm text-slate-500">Sin categorías.</li><% } %>
+    </ul>
+    <form method="post" action="/catalogo/categorias" class="flex gap-2 items-end">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-      <div class="field">
-        <label for="nombre_categoria">Nueva categoría</label>
-        <input id="nombre_categoria" name="nombre_categoria" required />
+      <div class="flex-1">
+        <label for="nombre_categoria" class="field-label">Nueva categoría</label>
+        <input id="nombre_categoria" name="nombre_categoria" required class="field-input" />
       </div>
-      <button type="submit">Agregar</button>
+      <button type="submit" class="btn btn-primary">Agregar</button>
     </form>
   </div>
 
   <div class="card">
-    <h3>Plataformas</h3>
-    <table>
-      <tbody>
-        <% plataformas.forEach(p => { %><tr><td><%= p.nombre_plataforma %></td></tr><% }) %>
-      </tbody>
-    </table>
-    <form method="post" action="/catalogo/plataformas">
+    <h3 class="font-semibold text-slate-900 mb-3">Plataformas</h3>
+    <ul class="divide-y divide-slate-100 mb-4">
+      <% plataformas.forEach(p => { %><li class="py-2 text-sm text-slate-700"><%= p.nombre_plataforma %></li><% }) %>
+      <% if (plataformas.length === 0) { %><li class="py-2 text-sm text-slate-500">Sin plataformas.</li><% } %>
+    </ul>
+    <form method="post" action="/catalogo/plataformas" class="flex gap-2 items-end">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-      <div class="field">
-        <label for="nombre_plataforma">Nueva plataforma</label>
-        <input id="nombre_plataforma" name="nombre_plataforma" required />
+      <div class="flex-1">
+        <label for="nombre_plataforma" class="field-label">Nueva plataforma</label>
+        <input id="nombre_plataforma" name="nombre_plataforma" required class="field-input" />
       </div>
-      <button type="submit">Agregar</button>
+      <button type="submit" class="btn btn-primary">Agregar</button>
     </form>
   </div>
 </div>

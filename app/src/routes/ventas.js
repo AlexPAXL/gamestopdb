@@ -2,6 +2,7 @@
 const express = require('express');
 const { requireRole } = require('../middleware/auth');
 const { registrarVenta, anularVenta } = require('../lib/procs');
+const { mensajeAmigable } = require('../lib/errores');
 
 const router = express.Router();
 const NUM_LINEAS = 8; // filas en blanco del formulario; sin JS de "agregar línea" (ver shortcut abajo)
@@ -14,7 +15,7 @@ async function resolverContextoVenta(req) {
   if (user.fk_Colaborador) {
     return { colaboradorId: user.fk_Colaborador, sucursalId: user.fk_Sucursal, sucursalNombre: user.nombreSucursal, colaboradorNombre: user.nombreColaborador };
   }
-  const colaboradorId = req.query.colaborador ? Number(req.query.colaborador) : (req.body.colaborador ? Number(req.body.colaborador) : null);
+  const colaboradorId = req.query.colaborador ? Number(req.query.colaborador) : (req.body?.colaborador ? Number(req.body.colaborador) : null);
   if (!colaboradorId) return null;
   const [[colab]] = await req.db.query(
     `SELECT co.idColaborador, co.nombre_colaborador, co.fk_Sucursal, s.nombre_sucursal
@@ -87,7 +88,8 @@ router.post('/', requireRole('vendedor', 'gerente', 'admin'), async (req, res) =
     });
     res.render('ventas/recibo', { title: 'Venta registrada', idVenta, recibo, contexto });
   } catch (err) {
-    req.flash('error', err.sqlMessage || 'No se pudo registrar la venta.');
+    console.error('Error al registrar venta:', err);
+    req.flash('error', mensajeAmigable(err, 'No se pudo registrar la venta. Verifica los datos e intenta de nuevo.'));
     res.redirect(`/ventas/nueva?colaborador=${contexto.colaboradorId}`);
   }
 });
@@ -112,7 +114,8 @@ router.post('/:id/anular', requireRole('gerente', 'admin'), async (req, res) => 
     await anularVenta(req.db, { idVenta: req.params.id, motivo: req.body.motivo });
     req.flash('success', 'Venta anulada; el stock fue devuelto.');
   } catch (err) {
-    req.flash('error', err.sqlMessage || 'No se pudo anular la venta.');
+    console.error('Error al anular venta:', err);
+    req.flash('error', mensajeAmigable(err, 'No se pudo anular la venta. Intenta de nuevo.'));
   }
   res.redirect('/ventas');
 });

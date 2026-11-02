@@ -1,39 +1,70 @@
 <%- include('partials/top') %>
 
-<h1>Proveedores</h1>
+<div class="mb-5">
+  <h2 class="text-lg font-semibold text-slate-900">Proveedores</h2>
+  <p class="text-slate-500 text-sm">Contactos de proveedores usados al registrar compras.</p>
+</div>
 
-<div class="card">
-  <h3>Nuevo proveedor</h3>
-  <form method="post" action="/proveedores">
+<div class="card mb-5">
+  <h3 class="font-semibold text-slate-900 mb-4">Nuevo proveedor</h3>
+  <form method="post" action="/proveedores" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-    <div class="linea-detalle">
-      <div class="field"><label>Nombre</label><input name="nombre_proveedor" required /></div>
-      <div class="field"><label>Teléfono</label><input name="telefono_proveedor" required /></div>
-      <div class="field"><label>Correo</label><input name="correo_proveedor" type="email" required /></div>
+    <div>
+      <label for="nombre_proveedor" class="field-label">Nombre</label>
+      <input id="nombre_proveedor" name="nombre_proveedor" required class="field-input" />
     </div>
-    <button type="submit">Crear</button>
+    <div>
+      <label for="telefono_proveedor" class="field-label">Teléfono</label>
+      <input id="telefono_proveedor" name="telefono_proveedor" required class="field-input" />
+    </div>
+    <div>
+      <label for="correo_proveedor" class="field-label">Correo</label>
+      <input id="correo_proveedor" name="correo_proveedor" type="email" required class="field-input" />
+    </div>
+    <button type="submit" class="btn btn-primary">Crear</button>
   </form>
 </div>
 
-<table>
-  <thead><tr><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>Estado</th><th></th></tr></thead>
-  <tbody>
-    <% proveedores.forEach(p => { %>
-    <tr>
-      <td><%= p.nombre_proveedor %></td>
-      <td><%= p.telefono_proveedor %></td>
-      <td><%= p.correo_proveedor %></td>
-      <td><span class="badge <%= p.activo ? 'ok' : 'off' %>"><%= p.activo ? 'Activo' : 'Inactivo' %></span></td>
-      <td>
-        <form method="post" action="/proveedores/<%= p.idProveedor %>/activo" style="margin:0">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-          <input type="hidden" name="activo" value="<%= p.activo ? 0 : 1 %>" />
-          <button type="submit" class="btn-secondary btn"><%= p.activo ? 'Desactivar' : 'Activar' %></button>
-        </form>
-      </td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
+<div class="table-wrap">
+  <table class="data-table">
+    <thead><tr><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+      <% proveedores.forEach(p => { %>
+      <tr>
+        <td class="font-medium text-slate-800"><%= p.nombre_proveedor %></td>
+        <td><%= p.telefono_proveedor %></td>
+        <td><%= p.correo_proveedor %></td>
+        <td><span class="badge <%= p.activo ? 'badge-ok' : 'badge-off' %>"><%= p.activo ? 'Activo' : 'Inactivo' %></span></td>
+        <td>
+          <% if (p.activo) { %>
+          <form method="post" action="/proveedores/<%= p.idProveedor %>/activo" x-data="confirmModal" class="m-0">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <input type="hidden" name="activo" value="0" />
+            <button type="button" @click="open = true" class="btn btn-secondary text-xs px-3 py-1.5">Desactivar</button>
+            <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+              <div @click.outside="open = false" class="card max-w-sm w-full">
+                <h3 class="font-semibold text-slate-900 mb-1">¿Desactivar a <%= p.nombre_proveedor %>?</h3>
+                <p class="text-sm text-slate-500 mb-4">Ya no aparecerá disponible al registrar una nueva compra. Puedes reactivarlo después.</p>
+                <div class="flex justify-end gap-2">
+                  <button type="button" @click="open = false" class="btn btn-ghost">Cancelar</button>
+                  <button type="submit" class="btn btn-danger">Desactivar</button>
+                </div>
+              </div>
+            </div>
+          </form>
+          <% } else { %>
+          <form method="post" action="/proveedores/<%= p.idProveedor %>/activo" class="m-0">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <input type="hidden" name="activo" value="1" />
+            <button type="submit" class="btn btn-secondary text-xs px-3 py-1.5">Activar</button>
+          </form>
+          <% } %>
+        </td>
+      </tr>
+      <% }) %>
+      <% if (proveedores.length === 0) { %><tr><td colspan="5" class="text-sm text-slate-500 text-center py-6">Sin proveedores registrados.</td></tr><% } %>
+    </tbody>
+  </table>
+</div>
 
 <%- include('partials/bottom') %>

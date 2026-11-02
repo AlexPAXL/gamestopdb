@@ -1,23 +1,29 @@
 <%- include('../partials/top') %>
 
-<div class="toolbar">
-  <h1>Compras a proveedores</h1>
-  <a class="btn" href="/compras/nueva">+ Registrar compra</a>
+<div class="flex items-center justify-between mb-5">
+  <div>
+    <h2 class="text-lg font-semibold text-slate-900">Compras a proveedores</h2>
+    <p class="text-slate-500 text-sm">Últimas 200 compras registradas.</p>
+  </div>
+  <a class="btn btn-primary" href="/compras/nueva"><%- include('../partials/icon', { name: 'plus', cls: 'w-4 h-4' }) %> Registrar compra</a>
 </div>
 
-<table>
-  <thead><tr><th>#</th><th>Fecha</th><th>Proveedor</th><th>Sucursal</th><th>Total</th></tr></thead>
-  <tbody>
-    <% compras.forEach(c => { %>
-    <tr>
-      <td><%= c.idCompra_Proveedor %></td>
-      <td><%= new Date(c.fecha_compra).toLocaleString('es-GT') %></td>
-      <td><%= c.nombre_proveedor %></td>
-      <td><%= c.nombre_sucursal %></td>
-      <td>Q<%= Number(c.total_compra).toFixed(2) %></td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
+<div class="table-wrap">
+  <table class="data-table">
+    <thead><tr><th>#</th><th>Fecha</th><th>Proveedor</th><th>Sucursal</th><th>Total</th></tr></thead>
+    <tbody>
+      <% compras.forEach(c => { %>
+      <tr>
+        <td class="font-medium text-slate-800">#<%= c.idCompra_Proveedor %></td>
+        <td><%= new Date(c.fecha_compra).toLocaleString('es-GT') %></td>
+        <td><%= c.nombre_proveedor %></td>
+        <td><%= c.nombre_sucursal %></td>
+        <td class="font-medium text-slate-800">Q<%= Number(c.total_compra).toFixed(2) %></td>
+      </tr>
+      <% }) %>
+      <% if (compras.length === 0) { %><tr><td colspan="5" class="text-sm text-slate-500 text-center py-6">Sin compras registradas.</td></tr><% } %>
+    </tbody>
+  </table>
+</div>
 
 <%- include('../partials/bottom') %>

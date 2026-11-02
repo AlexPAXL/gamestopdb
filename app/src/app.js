@@ -1,5 +1,6 @@
 'use strict';
 const path = require('path');
+const crypto = require('crypto');
 const express = require('express');
 const session = require('express-session');
 const helmet = require('helmet');
@@ -9,6 +10,7 @@ const { csrfToken, csrfProtect } = require('./middleware/csrf');
 const { requireLogin, attachDb } = require('./middleware/auth');
 
 const authRoutes = require('./routes/auth');
+const dashboardRoutes = require('./routes/dashboard');
 const catalogoRoutes = require('./routes/catalogo');
 const inventarioRoutes = require('./routes/inventario');
 const ventasRoutes = require('./routes/ventas');
@@ -24,7 +26,31 @@ const app = express();
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(helmet({ contentSecurityPolicy: false })); // CSP relajado: no usamos CDNs ni inline-script-eval raros, pero esto es MVP
+
+// CSP real: Alpine.js y Chart.js se sirven desde el propio servidor
+// (public/js/vendor, copiados de node_modules por scripts/copy_vendor.js)
+// en vez de un CDN de terceros, así que script-src no necesita abrir
+// ningún host externo — solo 'self' más un nonce nuevo por petición para
+// el único <script> inline que queda (la inicialización de los gráficos
+// del dashboard con los datos ya renderizados). Antes el CSP estaba
+// apagado por completo ("MVP"); se activa ahora que hay JS en la página.
+app.use((req, res, next) => {
+  res.locals.cspNonce = crypto.randomBytes(16).toString('base64');
+  next();
+});
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", (req, res) => `'nonce-${res.locals.cspNonce}'`],
+        styleSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:'],
+        connectSrc: ["'self'"],
+      },
+    },
+  })
+);
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -48,6 +74,7 @@ app.use((req, res, next) => {
   // petición con res.render('error', ...), la vista ya necesita esta
   // variable (top.ejs la usa para decidir si muestra la barra de nav).
   res.locals.currentUser = req.session.user || null;
+  res.locals.currentPath = req.path; // usado por el sidebar para resaltar el ítem activo
   next();
 });
 app.use(csrfToken);
@@ -60,7 +87,7 @@ app.use('/', authRoutes);
 // Todo lo demás requiere sesión iniciada.
 app.use(requireLogin);
 
-app.get('/', (req, res) => res.render('dashboard', { title: 'Panel' }));
+app.use('/', dashboardRoutes);
 
 app.use('/catalogo', catalogoRoutes);
 app.use('/inventario', inventarioRoutes);

@@ -22,7 +22,7 @@ router.post('/', puedeUsar, async (req, res) => {
 });
 
 router.post('/:id/activo', puedeUsar, async (req, res) => {
-  await req.db.query('UPDATE proveedor SET activo = ? WHERE idProveedor = ?', [req.body.activo ? 1 : 0, req.params.id]);
+  await req.db.query('UPDATE proveedor SET activo = ? WHERE idProveedor = ?', [req.body.activo === '1' ? 1 : 0, req.params.id]);
   res.redirect('/proveedores');
 });
 

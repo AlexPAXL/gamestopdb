@@ -1,32 +1,54 @@
 <%- include('../partials/top') %>
 
-<h1>Ventas</h1>
-<p class="subtitle">Últimas 200 ventas, todas las sucursales.</p>
+<div class="flex items-center justify-between mb-5">
+  <div>
+    <h2 class="text-lg font-semibold text-slate-900">Ventas</h2>
+    <p class="text-slate-500 text-sm">Últimas 200 ventas, todas las sucursales.</p>
+  </div>
+  <a class="btn btn-primary" href="/ventas/nueva"><%- include('../partials/icon', { name: 'plus', cls: 'w-4 h-4' }) %> Nueva venta</a>
+</div>
 
-<table>
-  <thead><tr><th>#</th><th>Fecha</th><th>Sucursal</th><th>Cliente</th><th>Colaborador</th><th>Total</th><th>Estado</th><th></th></tr></thead>
-  <tbody>
-    <% ventas.forEach(v => { %>
-    <tr>
-      <td><%= v.idVenta %></td>
-      <td><%= new Date(v.fecha_venta).toLocaleString('es-GT') %></td>
-      <td><%= v.nombre_sucursal %></td>
-      <td><%= v.nombre_cliente %></td>
-      <td><%= v.nombre_colaborador %></td>
-      <td>Q<%= Number(v.total_venta).toFixed(2) %></td>
-      <td><span class="badge <%= v.estado_venta === 'COMPLETADA' ? 'ok' : 'off' %>"><%= v.estado_venta %></span></td>
-      <td>
-        <% if (v.estado_venta === 'COMPLETADA') { %>
-        <form method="post" action="/ventas/<%= v.idVenta %>/anular" style="margin:0;display:flex;gap:0.25rem">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-          <input name="motivo" placeholder="Motivo" required style="width:120px" />
-          <button type="submit" class="btn btn-danger" onclick="return confirm('¿Anular esta venta? Se devolverá el stock.');">Anular</button>
-        </form>
-        <% } %>
-      </td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
+<div class="table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr><th>#</th><th>Fecha</th><th>Sucursal</th><th>Cliente</th><th>Colaborador</th><th>Total</th><th>Estado</th><th></th></tr>
+    </thead>
+    <tbody>
+      <% ventas.forEach(v => { %>
+      <tr>
+        <td class="font-medium text-slate-800">#<%= v.idVenta %></td>
+        <td><%= new Date(v.fecha_venta).toLocaleString('es-GT') %></td>
+        <td><%= v.nombre_sucursal %></td>
+        <td><%= v.nombre_cliente %></td>
+        <td><%= v.nombre_colaborador %></td>
+        <td class="font-medium text-slate-800">Q<%= Number(v.total_venta).toFixed(2) %></td>
+        <td><span class="badge <%= v.estado_venta === 'COMPLETADA' ? 'badge-ok' : 'badge-off' %>"><%= v.estado_venta %></span></td>
+        <td>
+          <% if (v.estado_venta === 'COMPLETADA') { %>
+          <form method="post" action="/ventas/<%= v.idVenta %>/anular" x-data="confirmModal">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button type="button" @click="open = true" class="btn btn-danger text-xs px-3 py-1.5">Anular</button>
+
+            <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+              <div @click.outside="open = false" class="card max-w-sm w-full">
+                <h3 class="font-semibold text-slate-900 mb-1">¿Anular la venta #<%= v.idVenta %>?</h3>
+                <p class="text-sm text-slate-500 mb-4">Se devolverá el stock al inventario. Esta acción queda registrada en la bitácora.</p>
+                <label class="field-label">Motivo</label>
+                <input name="motivo" required class="field-input mb-4" placeholder="Ej. cliente se arrepintió" />
+                <div class="flex justify-end gap-2">
+                  <button type="button" @click="open = false" class="btn btn-ghost">Cancelar</button>
+                  <button type="submit" class="btn btn-danger">Confirmar anulación</button>
+                </div>
+              </div>
+            </div>
+          </form>
+          <% } %>
+        </td>
+      </tr>
+      <% }) %>
+      <% if (ventas.length === 0) { %><tr><td colspan="8" class="text-sm text-slate-500 text-center py-6">Sin ventas registradas.</td></tr><% } %>
+    </tbody>
+  </table>
+</div>
 
 <%- include('../partials/bottom') %>
