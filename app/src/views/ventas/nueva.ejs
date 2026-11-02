@@ -1,0 +1,52 @@
+<%- include('../partials/top') %>
+
+<h1>Nueva venta</h1>
+<p class="subtitle">Vendiendo como <strong><%= contexto.colaboradorNombre %></strong> · <%= contexto.sucursalNombre %></p>
+
+<div class="card">
+  <form method="post" action="/ventas">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <input type="hidden" name="colaborador" value="<%= contexto.colaboradorId %>" />
+
+    <h3>Cliente</h3>
+    <div class="field">
+      <label for="cliente_id">Cliente existente</label>
+      <select id="cliente_id" name="cliente_id">
+        <option value="">— Elegir —</option>
+        <% clientes.forEach(c => { %><option value="<%= c.idCliente %>"><%= c.nombre_cliente %></option><% }) %>
+      </select>
+    </div>
+    <p class="muted">...o registra uno nuevo:</p>
+    <div class="linea-detalle">
+      <div class="field"><label>Nombre</label><input name="cliente_nuevo_nombre" /></div>
+      <div class="field"><label>Correo</label><input name="cliente_nuevo_correo" type="email" /></div>
+      <div></div>
+    </div>
+
+    <h3>Productos</h3>
+    <% if (productos.length === 0) { %>
+      <p class="muted">No hay existencias registradas en esta sucursal.</p>
+    <% } %>
+    <% for (let i = 0; i < lineas; i++) { %>
+    <div class="linea-detalle">
+      <div class="field">
+        <select name="producto">
+          <option value="">— Producto —</option>
+          <% productos.forEach(p => { %>
+            <option value="<%= p.idProducto %>" <%= p.stock_disponible <= 0 ? 'disabled' : '' %>>
+              <%= p.nombre_producto %> (stock: <%= p.stock_disponible %>, Q<%= Number(p.precio_producto).toFixed(2) %>)
+            </option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="field"><input type="number" name="cantidad" min="1" placeholder="Cantidad" /></div>
+      <div></div>
+    </div>
+    <% } %>
+
+    <button type="submit">Registrar venta</button>
+    <a class="btn btn-secondary" href="/">Cancelar</a>
+  </form>
+</div>
+
+<%- include('../partials/bottom') %>

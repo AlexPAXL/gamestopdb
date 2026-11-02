@@ -1,0 +1,42 @@
+<%- include('partials/top') %>
+
+<h1>Inventario</h1>
+<p class="subtitle">
+  <% if (rol === 'vendedor') { %>Stock disponible en tu sucursal.<% } else { %>Stock disponible por sucursal.<% } %>
+</p>
+
+<% if (rol !== 'vendedor') { %>
+<form method="get" class="toolbar">
+  <div class="field" style="min-width:260px">
+    <label for="sucursal">Filtrar por sucursal</label>
+    <select id="sucursal" name="sucursal" onchange="this.form.submit()">
+      <option value="">— Todas —</option>
+      <% sucursales.forEach(s => { %>
+        <option value="<%= s.idSucursal %>" <%= String(filtro) === String(s.idSucursal) ? 'selected' : '' %>><%= s.nombre_sucursal %></option>
+      <% }) %>
+    </select>
+  </div>
+</form>
+<% } %>
+
+<table>
+  <thead>
+    <tr><th>Sucursal</th><th>SKU</th><th>Producto</th><th>Categoría</th><th>Plataforma</th><th>Precio</th><th>Stock</th></tr>
+  </thead>
+  <tbody>
+    <% filas.forEach(f => { %>
+    <tr>
+      <td><%= f.nombre_sucursal %></td>
+      <td><code><%= f.codigo_sku %></code></td>
+      <td><%= f.nombre_producto %></td>
+      <td><%= f.nombre_categoria %></td>
+      <td><%= f.nombre_plataforma || '—' %></td>
+      <td>Q<%= Number(f.precio_producto).toFixed(2) %></td>
+      <td><span class="badge <%= f.stock_disponible < 5 ? 'warn' : 'ok' %>"><%= f.stock_disponible %></span></td>
+    </tr>
+    <% }) %>
+    <% if (filas.length === 0) { %><tr><td colspan="7" class="muted">Sin existencias registradas.</td></tr><% } %>
+  </tbody>
+</table>
+
+<%- include('partials/bottom') %>

@@ -1,0 +1,47 @@
+<%- include('partials/top') %>
+
+<h1>Sucursales</h1>
+
+<div class="card">
+  <h3>Nueva sucursal</h3>
+  <form method="post" action="/sucursales">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <div class="linea-detalle">
+      <div class="field"><label>Nombre</label><input name="nombre_sucursal" required /></div>
+      <div class="field"><label>Dirección</label><input name="direccion_sucursal" required /></div>
+      <div class="field"><label>Ciudad</label><input name="ciudad_sucursal" required /></div>
+    </div>
+    <button type="submit">Crear</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Nombre</th><th>Dirección</th><th>Ciudad</th><th>Teléfonos</th><th>Estado</th><th></th></tr></thead>
+  <tbody>
+    <% sucursales.forEach(s => { %>
+    <tr>
+      <td><%= s.nombre_sucursal %></td>
+      <td><%= s.direccion_sucursal %></td>
+      <td><%= s.ciudad_sucursal %></td>
+      <td>
+        <%= (porSucursal[s.idSucursal] || []).join(', ') || '—' %>
+        <form method="post" action="/sucursales/<%= s.idSucursal %>/telefono" style="display:inline-flex;gap:0.25rem;margin-left:0.5rem">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <input name="telefono" placeholder="8 dígitos" style="width:100px" />
+          <button type="submit" class="btn-secondary btn">+</button>
+        </form>
+      </td>
+      <td><span class="badge <%= s.activa ? 'ok' : 'off' %>"><%= s.activa ? 'Activa' : 'Inactiva' %></span></td>
+      <td>
+        <form method="post" action="/sucursales/<%= s.idSucursal %>/activa" style="margin:0">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <input type="hidden" name="activa" value="<%= s.activa ? 0 : 1 %>" />
+          <button type="submit" class="btn-secondary btn"><%= s.activa ? 'Desactivar' : 'Activar' %></button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<%- include('partials/bottom') %>

@@ -1,0 +1,45 @@
+<%- include('partials/top') %>
+
+<h1>Colaboradores</h1>
+
+<div class="card">
+  <h3>Nuevo colaborador</h3>
+  <form method="post" action="/colaboradores">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <div class="linea-detalle">
+      <div class="field"><label>Nombre</label><input name="nombre_colaborador" required /></div>
+      <div class="field"><label>Puesto</label><input name="puesto_colaborador" required /></div>
+      <div class="field">
+        <label>Sucursal</label>
+        <select name="fk_Sucursal" required>
+          <% sucursales.forEach(s => { %><option value="<%= s.idSucursal %>"><%= s.nombre_sucursal %></option><% }) %>
+        </select>
+      </div>
+    </div>
+    <button type="submit">Registrar</button>
+  </form>
+  <p class="muted">Esto solo crea el registro de personal. El usuario con el que inicia sesión en el sistema lo crea un administrador aparte (ver README: scripts/seed_app_usuarios.js).</p>
+</div>
+
+<table>
+  <thead><tr><th>Nombre</th><th>Puesto</th><th>Sucursal</th><th>Estado</th><th></th></tr></thead>
+  <tbody>
+    <% colaboradores.forEach(c => { %>
+    <tr>
+      <td><%= c.nombre_colaborador %></td>
+      <td><%= c.puesto_colaborador %></td>
+      <td><%= c.nombre_sucursal %></td>
+      <td><span class="badge <%= c.activo ? 'ok' : 'off' %>"><%= c.activo ? 'Activo' : 'Inactivo' %></span></td>
+      <td>
+        <form method="post" action="/colaboradores/<%= c.idColaborador %>/activo" style="margin:0">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <input type="hidden" name="activo" value="<%= c.activo ? 0 : 1 %>" />
+          <button type="submit" class="btn-secondary btn"><%= c.activo ? 'Desactivar' : 'Activar' %></button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<%- include('partials/bottom') %>

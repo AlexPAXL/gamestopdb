@@ -1,0 +1,24 @@
+<%- include('../partials/top') %>
+
+<p class="subtitle"><a href="/reportes">&larr; Todos los reportes</a></p>
+<h1><%= reporte.titulo %></h1>
+<% if (reporte.nota) { %><p class="muted"><%= reporte.nota %></p><% } %>
+
+<% const columnas = filas.length ? Object.keys(filas[0]) : []; %>
+<table>
+  <thead>
+    <tr><% columnas.forEach(c => { %><th><%= c %></th><% }) %></tr>
+  </thead>
+  <tbody>
+    <% filas.forEach(fila => { %>
+    <tr>
+      <% columnas.forEach(c => { %>
+        <td><%= fila[c] === null ? '—' : fila[c] %></td>
+      <% }) %>
+    </tr>
+    <% }) %>
+    <% if (filas.length === 0) { %><tr><td colspan="<%= columnas.length || 1 %>" class="muted">Sin datos.</td></tr><% } %>
+  </tbody>
+</table>
+
+<%- include('../partials/bottom') %>

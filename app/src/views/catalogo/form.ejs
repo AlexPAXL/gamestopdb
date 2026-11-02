@@ -1,0 +1,61 @@
+<%- include('../partials/top') %>
+
+<h1><%= title %></h1>
+
+<div class="card">
+  <form method="post" action="<%= producto ? '/catalogo/productos/' + producto.idProducto : '/catalogo/productos' %>">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+    <% if (!producto) { %>
+    <div class="field">
+      <label for="codigo_sku">Código SKU</label>
+      <input id="codigo_sku" name="codigo_sku" required />
+    </div>
+    <% } %>
+
+    <div class="field">
+      <label for="nombre_producto">Nombre</label>
+      <input id="nombre_producto" name="nombre_producto" required value="<%= producto ? producto.nombre_producto : '' %>" />
+    </div>
+
+    <div class="field">
+      <label for="marca_producto">Marca</label>
+      <input id="marca_producto" name="marca_producto" required value="<%= producto ? producto.marca_producto : '' %>" />
+    </div>
+
+    <div class="field">
+      <label for="fk_Categoria">Categoría</label>
+      <select id="fk_Categoria" name="fk_Categoria" required>
+        <% categorias.forEach(c => { %>
+          <option value="<%= c.idCategoria %>" <%= producto && producto.fk_Categoria === c.idCategoria ? 'selected' : '' %>><%= c.nombre_categoria %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="fk_Plataforma">Plataforma (opcional)</label>
+      <select id="fk_Plataforma" name="fk_Plataforma">
+        <option value="">— Ninguna —</option>
+        <% plataformas.forEach(pl => { %>
+          <option value="<%= pl.idPlataforma %>" <%= producto && producto.fk_Plataforma === pl.idPlataforma ? 'selected' : '' %>><%= pl.nombre_plataforma %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="precio_producto">Precio (Q)</label>
+      <input id="precio_producto" name="precio_producto" type="number" step="0.01" min="0.01" required value="<%= producto ? producto.precio_producto : '' %>" />
+    </div>
+
+    <% if (producto) { %>
+    <div class="field">
+      <label><input type="checkbox" name="activo" value="1" style="width:auto" <%= producto.activo ? 'checked' : '' %> /> Activo (visible para la venta)</label>
+    </div>
+    <% } %>
+
+    <button type="submit">Guardar</button>
+    <a class="btn btn-secondary" href="/catalogo/productos">Cancelar</a>
+  </form>
+</div>
+
+<%- include('../partials/bottom') %>

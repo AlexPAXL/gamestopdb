@@ -1,0 +1,42 @@
+<%- include('../partials/top') %>
+
+<h1>Categorías y plataformas</h1>
+<p class="subtitle"><a href="/catalogo/productos">&larr; Volver al catálogo</a></p>
+
+<div class="grid-2">
+  <div class="card">
+    <h3>Categorías</h3>
+    <table>
+      <tbody>
+        <% categorias.forEach(c => { %><tr><td><%= c.nombre_categoria %></td></tr><% }) %>
+      </tbody>
+    </table>
+    <form method="post" action="/catalogo/categorias">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <div class="field">
+        <label for="nombre_categoria">Nueva categoría</label>
+        <input id="nombre_categoria" name="nombre_categoria" required />
+      </div>
+      <button type="submit">Agregar</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Plataformas</h3>
+    <table>
+      <tbody>
+        <% plataformas.forEach(p => { %><tr><td><%= p.nombre_plataforma %></td></tr><% }) %>
+      </tbody>
+    </table>
+    <form method="post" action="/catalogo/plataformas">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <div class="field">
+        <label for="nombre_plataforma">Nueva plataforma</label>
+        <input id="nombre_plataforma" name="nombre_plataforma" required />
+      </div>
+      <button type="submit">Agregar</button>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/bottom') %>

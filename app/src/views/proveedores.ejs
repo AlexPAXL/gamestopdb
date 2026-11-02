@@ -1,0 +1,39 @@
+<%- include('partials/top') %>
+
+<h1>Proveedores</h1>
+
+<div class="card">
+  <h3>Nuevo proveedor</h3>
+  <form method="post" action="/proveedores">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <div class="linea-detalle">
+      <div class="field"><label>Nombre</label><input name="nombre_proveedor" required /></div>
+      <div class="field"><label>Teléfono</label><input name="telefono_proveedor" required /></div>
+      <div class="field"><label>Correo</label><input name="correo_proveedor" type="email" required /></div>
+    </div>
+    <button type="submit">Crear</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>Estado</th><th></th></tr></thead>
+  <tbody>
+    <% proveedores.forEach(p => { %>
+    <tr>
+      <td><%= p.nombre_proveedor %></td>
+      <td><%= p.telefono_proveedor %></td>
+      <td><%= p.correo_proveedor %></td>
+      <td><span class="badge <%= p.activo ? 'ok' : 'off' %>"><%= p.activo ? 'Activo' : 'Inactivo' %></span></td>
+      <td>
+        <form method="post" action="/proveedores/<%= p.idProveedor %>/activo" style="margin:0">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <input type="hidden" name="activo" value="<%= p.activo ? 0 : 1 %>" />
+          <button type="submit" class="btn-secondary btn"><%= p.activo ? 'Desactivar' : 'Activar' %></button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<%- include('partials/bottom') %>

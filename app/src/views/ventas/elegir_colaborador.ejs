@@ -1,0 +1,21 @@
+<%- include('../partials/top') %>
+
+<h1>Nueva venta</h1>
+<p class="subtitle">Tu usuario no está ligado a un colaborador de tienda: elige a nombre de quién se registra la venta.</p>
+
+<div class="card">
+  <table>
+    <thead><tr><th>Colaborador</th><th>Sucursal</th><th></th></tr></thead>
+    <tbody>
+      <% colaboradores.forEach(c => { %>
+      <tr>
+        <td><%= c.nombre_colaborador %></td>
+        <td><%= c.nombre_sucursal %></td>
+        <td><a class="btn btn-secondary" href="/ventas/nueva?colaborador=<%= c.idColaborador %>">Elegir</a></td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/bottom') %>

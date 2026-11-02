@@ -1,0 +1,14 @@
+<%- include('../partials/top') %>
+
+<h1>Reportes</h1>
+<p class="subtitle">Disponibles para tu rol.</p>
+
+<div class="card">
+  <ul>
+    <% reportes.forEach(r => { %>
+      <li><a href="/reportes/<%= r.key %>"><%= r.titulo %></a></li>
+    <% }) %>
+  </ul>
+</div>
+
+<%- include('../partials/bottom') %>

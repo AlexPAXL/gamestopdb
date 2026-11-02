@@ -1,0 +1,43 @@
+<%- include('../partials/top') %>
+
+<h1>Clientes</h1>
+<p class="subtitle">El correo se muestra enmascarado; "Ver correo" lo revela y queda registrado en la bitácora.</p>
+
+<% if (revelado) { %>
+<div class="card">
+  <strong>Datos completos de <%= revelado.nombre_cliente %>:</strong> <%= revelado.correo_cliente %>
+  <p class="muted">Esta consulta se registró en la bitácora de auditoría.</p>
+</div>
+<% } %>
+
+<div class="card">
+  <h3>Nuevo cliente</h3>
+  <form method="post" action="/clientes">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <div class="linea-detalle">
+      <div class="field"><label>Nombre</label><input name="nombre_cliente" required /></div>
+      <div class="field"><label>Correo</label><input name="correo_cliente" type="email" required /></div>
+      <button type="submit">Agregar</button>
+    </div>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Nombre</th><th>Correo (enmascarado)</th><th></th></tr></thead>
+  <tbody>
+    <% clientes.forEach(c => { %>
+    <tr>
+      <td><%= c.nombre_cliente %></td>
+      <td><%= c.correo_enmascarado %></td>
+      <td>
+        <form method="post" action="/clientes/<%= c.idCliente %>/consultar" style="margin:0">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button type="submit" class="btn-secondary btn">Ver correo</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<%- include('../partials/bottom') %>

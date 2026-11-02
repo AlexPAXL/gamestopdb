@@ -1,0 +1,73 @@
+/* Estilos mínimos, sin framework: la app es server-rendered, sin paso de build. */
+:root {
+  --azul: #065a82;
+  --azul-osc: #03334a;
+  --gris: #4a5568;
+  --borde: #e2e8f0;
+  --fondo: #f5f6fa;
+  --rojo: #b3261e;
+  --verde: #1b7a3d;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  margin: 0;
+  background: #fff;
+  color: #1a2733;
+}
+header.top {
+  background: var(--azul-osc);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+header.top .brand { font-weight: 700; font-size: 1.1rem; }
+header.top nav a {
+  color: #e2eef4;
+  text-decoration: none;
+  margin-right: 1rem;
+  font-size: 0.92rem;
+}
+header.top nav a:hover { text-decoration: underline; }
+header.top .user { font-size: 0.85rem; color: #cadcfc; display: flex; align-items: center; gap: 0.75rem; }
+header.top form.logout button {
+  background: none; border: 1px solid #cadcfc; color: #cadcfc; border-radius: 4px;
+  padding: 0.25rem 0.6rem; cursor: pointer; font-size: 0.8rem;
+}
+main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+h1 { font-size: 1.6rem; margin-bottom: 0.25rem; }
+.subtitle { color: var(--gris); margin-top: 0; margin-bottom: 1.25rem; }
+table { border-collapse: collapse; width: 100%; margin-bottom: 1.5rem; font-size: 0.92rem; }
+th, td { border-bottom: 1px solid var(--borde); padding: 0.5rem 0.6rem; text-align: left; }
+th { background: var(--fondo); font-weight: 600; }
+tr:hover td { background: #fafbfe; }
+.card { background: var(--fondo); border: 1px solid var(--borde); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.25rem; }
+form .field { margin-bottom: 0.9rem; }
+label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.25rem; }
+input, select, textarea {
+  width: 100%; padding: 0.5rem 0.6rem; border: 1px solid var(--borde); border-radius: 6px; font-size: 0.95rem;
+}
+button, .btn {
+  background: var(--azul); color: #fff; border: none; border-radius: 6px;
+  padding: 0.55rem 1.1rem; font-size: 0.92rem; cursor: pointer; text-decoration: none; display: inline-block;
+}
+button:hover, .btn:hover { background: var(--azul-osc); }
+.btn-secondary { background: #fff; color: var(--azul); border: 1px solid var(--azul); }
+.btn-danger { background: var(--rojo); }
+.btn-danger:hover { background: #8c1d17; }
+.flash { padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1.25rem; font-size: 0.92rem; }
+.flash.error { background: #fde8e7; color: var(--rojo); border: 1px solid #f3b9b5; }
+.flash.success { background: #e7f6ec; color: var(--verde); border: 1px solid #b7e3c3; }
+.badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 10px; font-size: 0.78rem; font-weight: 600; }
+.badge.ok { background: #e7f6ec; color: var(--verde); }
+.badge.off { background: #f1f1f1; color: #666; }
+.badge.warn { background: #fff3cd; color: #8a6400; }
+.muted { color: var(--gris); font-size: 0.88rem; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.linea-detalle { display: grid; grid-template-columns: 2fr 1fr auto; gap: 0.5rem; align-items: end; margin-bottom: 0.5rem; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+.login-wrap { max-width: 380px; margin: 4rem auto; }
+code { background: #f1f1f1; padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.85em; }

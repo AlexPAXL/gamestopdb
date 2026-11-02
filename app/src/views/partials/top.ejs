@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title %> · GameStop</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+<% const u = currentUser; %>
+<header class="top">
+  <div class="brand">🎮 GameStop · Sistema de gestión</div>
+  <% if (u) { %>
+  <nav>
+    <a href="/">Panel</a>
+    <% if (u.rol === 'vendedor' || u.rol === 'gerente' || u.rol === 'admin') { %>
+      <a href="/catalogo/productos">Catálogo</a>
+      <a href="/inventario">Inventario</a>
+      <a href="/ventas/nueva">Nueva venta</a>
+      <a href="/clientes">Clientes</a>
+    <% } %>
+    <% if (u.rol === 'gerente' || u.rol === 'admin') { %>
+      <a href="/ventas">Ventas</a>
+      <a href="/compras">Compras</a>
+      <a href="/proveedores">Proveedores</a>
+      <a href="/sucursales">Sucursales</a>
+      <a href="/colaboradores">Colaboradores</a>
+    <% } %>
+    <% if (u.rol === 'gerente' || u.rol === 'admin' || u.rol === 'auditor') { %>
+      <a href="/reportes">Reportes</a>
+      <a href="/bitacora">Bitácora</a>
+    <% } %>
+  </nav>
+  <div class="user">
+    <span><%= u.nombreColaborador || u.usuario %> · <strong><%= u.rol %></strong><%= u.nombreSucursal ? ' · ' + u.nombreSucursal : '' %></span>
+    <form class="logout" method="post" action="/logout">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <button type="submit">Salir</button>
+    </form>
+  </div>
+  <% } %>
+</header>
+<main>
+  <% if (typeof flash !== 'undefined' && flash) { %>
+    <div class="flash <%= flash.type %>"><%= flash.message %></div>
+  <% } %>

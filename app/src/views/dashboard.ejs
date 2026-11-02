@@ -1,0 +1,46 @@
+<%- include('partials/top') %>
+
+<h1>Hola, <%= currentUser.nombreColaborador || currentUser.usuario %></h1>
+<p class="subtitle">
+  Rol: <strong><%= currentUser.rol %></strong>
+  <% if (currentUser.nombreSucursal) { %> · Sucursal: <strong><%= currentUser.nombreSucursal %></strong><% } %>
+</p>
+
+<div class="grid-2">
+  <% if (['vendedor','gerente','admin'].includes(currentUser.rol)) { %>
+  <div class="card">
+    <h3>Punto de venta</h3>
+    <p class="muted">Registra una venta, revisa el inventario de tu sucursal o da de alta un cliente.</p>
+    <p><a class="btn" href="/ventas/nueva">Nueva venta</a> <a class="btn btn-secondary" href="/inventario">Ver inventario</a></p>
+  </div>
+  <% } %>
+
+  <% if (['gerente','admin'].includes(currentUser.rol)) { %>
+  <div class="card">
+    <h3>Gestión</h3>
+    <p class="muted">Catálogo, proveedores, compras y el personal de tus sucursales.</p>
+    <p>
+      <a class="btn" href="/compras/nueva">Registrar compra</a>
+      <a class="btn btn-secondary" href="/catalogo/productos">Catálogo</a>
+    </p>
+  </div>
+  <% } %>
+
+  <% if (['gerente','admin','auditor'].includes(currentUser.rol)) { %>
+  <div class="card">
+    <h3>Reportes y auditoría</h3>
+    <p class="muted">Ventas por sucursal, productos más vendidos, stock bajo y la bitácora de accesos.</p>
+    <p><a class="btn" href="/reportes">Ver reportes</a> <a class="btn btn-secondary" href="/bitacora">Bitácora</a></p>
+  </div>
+  <% } %>
+
+  <% if (currentUser.rol === 'admin') { %>
+  <div class="card">
+    <h3>Administración</h3>
+    <p class="muted">Sucursales, colaboradores y mantenimiento general del sistema.</p>
+    <p><a class="btn" href="/sucursales">Sucursales</a> <a class="btn btn-secondary" href="/colaboradores">Colaboradores</a></p>
+  </div>
+  <% } %>
+</div>
+
+<%- include('partials/bottom') %>

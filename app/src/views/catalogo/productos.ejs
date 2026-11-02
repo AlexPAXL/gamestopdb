@@ -1,0 +1,34 @@
+<%- include('../partials/top') %>
+
+<div class="toolbar">
+  <div>
+    <h1>Catálogo de productos</h1>
+    <p class="subtitle">SKU, categoría, plataforma y precio.</p>
+  </div>
+  <% if (puedeEditar) { %>
+    <a class="btn" href="/catalogo/productos/nuevo">+ Nuevo producto</a>
+    <a class="btn btn-secondary" href="/catalogo/categorias">Categorías / plataformas</a>
+  <% } %>
+</div>
+
+<table>
+  <thead>
+    <tr><th>SKU</th><th>Nombre</th><th>Marca</th><th>Categoría</th><th>Plataforma</th><th>Precio</th><th>Estado</th><% if (puedeEditar) { %><th></th><% } %></tr>
+  </thead>
+  <tbody>
+    <% productos.forEach(p => { %>
+    <tr>
+      <td><code><%= p.codigo_sku %></code></td>
+      <td><%= p.nombre_producto %></td>
+      <td><%= p.marca_producto %></td>
+      <td><%= p.nombre_categoria %></td>
+      <td><%= p.nombre_plataforma || '—' %></td>
+      <td>Q<%= Number(p.precio_producto).toFixed(2) %></td>
+      <td><span class="badge <%= p.activo ? 'ok' : 'off' %>"><%= p.activo ? 'Activo' : 'Descontinuado' %></span></td>
+      <% if (puedeEditar) { %><td><a href="/catalogo/productos/<%= p.idProducto %>/editar">Editar</a></td><% } %>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<%- include('../partials/bottom') %>

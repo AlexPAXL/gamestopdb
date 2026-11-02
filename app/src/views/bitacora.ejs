@@ -1,0 +1,44 @@
+<%- include('partials/top') %>
+
+<h1>Bitácora de auditoría</h1>
+<p class="subtitle">Últimos 150 registros. Solo lectura: ningún rol de negocio puede modificarla.</p>
+
+<form method="get" class="toolbar">
+  <div class="field" style="min-width:200px">
+    <label>Tabla</label>
+    <select name="tabla" onchange="this.form.submit()">
+      <option value="">— Todas —</option>
+      <% ['venta','cliente','producto'].forEach(t => { %>
+        <option value="<%= t %>" <%= tabla === t ? 'selected' : '' %>><%= t %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="field" style="min-width:200px">
+    <label>Operación</label>
+    <select name="operacion" onchange="this.form.submit()">
+      <option value="">— Todas —</option>
+      <% ['INSERT','UPDATE','DELETE','CONSULTA'].forEach(o => { %>
+        <option value="<%= o %>" <%= operacion === o ? 'selected' : '' %>><%= o %></option>
+      <% }) %>
+    </select>
+  </div>
+</form>
+
+<table>
+  <thead><tr><th>Fecha</th><th>Usuario DB</th><th>Tabla</th><th>Operación</th><th>Registro</th><th>Detalle</th></tr></thead>
+  <tbody>
+    <% filas.forEach(f => { %>
+    <tr>
+      <td><%= new Date(f.fecha).toLocaleString('es-GT') %></td>
+      <td><code><%= f.usuario_db %></code></td>
+      <td><%= f.tabla %></td>
+      <td><%= f.operacion %></td>
+      <td><%= f.id_registro ?? '—' %></td>
+      <td class="muted"><%= f.detalle || (f.datos_nuevos ? JSON.stringify(f.datos_nuevos) : '') %></td>
+    </tr>
+    <% }) %>
+    <% if (filas.length === 0) { %><tr><td colspan="6" class="muted">Sin registros.</td></tr><% } %>
+  </tbody>
+</table>
+
+<%- include('partials/bottom') %>
